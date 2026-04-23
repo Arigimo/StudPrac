@@ -1,11 +1,14 @@
+# Файл main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 
+# ШАГ 1: Импортируем функцию из соседнего файла
+from solve import solve_math_model
+
 app = FastAPI()
 
-#Разрешения на все
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -13,36 +16,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#Точки локаций
-class point (BaseModel):
-   id: int
-   x: int
-   y: int
 
-#итоговый рез - т
-class calc_request (BaseModel):
-    proj_name: str
+class Point(BaseModel):
+    id: int
+    x: float
+    y: float
+
+
+class CalcRequest(BaseModel):
+    project_name: str
     cost: float
-    K: int
-    C: int
+    capacity: int
+    points: List[Point]
 
-@app.get("/")
-def read_root():
-    return {"status": "server is online"}
 
-@app.get("/solve")
-async def solve_task(data: calc_request):
-    print(f"Запрос получен! Проект: {data.project_name}")
+@app.post("/solve")
+async def solve_task(data: CalcRequest):
 
-    mock_result = {
-        "total_cost": 15000,
-        "opened_magistrals": [0, 2],  # Математик скажет, какие ID стали главными
-        "connections": [
-            {"from_id": 1, "to_id": 0},
-            {"from_id": 4, "to_id": 0},
-            {"from_id": 3, "to_id": 2}
-        ]
-    }
+    result = solve_math_model(data.points, data.cost, data.capacity)
 
-    return mock_result
-
+    return result
