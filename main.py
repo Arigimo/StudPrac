@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import List
 from database import initialize_db, save_project
 
-from solve import solve_math_model
+from solve import model_solver
 
 app = FastAPI()
 
@@ -34,6 +34,6 @@ class CalcRequest(BaseModel):
 @app.post("/solve")
 async def solve_task(data: CalcRequest):
 
-    result = solve_math_model(data.points, data.cost, data.capacity)
+    result = model_solver(data.points, data.cost, data.capacity)
 
     return result
