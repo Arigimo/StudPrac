@@ -5,24 +5,6 @@ from pydantic import BaseModel
 from typing import List, Tuple
 
 
-
-def solve_math_model(points_list, cost, capacity):
-    print(f"Математик получил {len(points_list)} точек")
-
-    first_node_id = points_list[0].id
-    connections = []
-
-    for p in points_list:
-        if p.id != first_node_id:
-            connections.append({"from_id": p.id, "to_id": first_node_id})
-
-    return {
-        "total_cost": cost + (len(points_list) * 10),  # Просто пример формулы
-        "opened_magistrals": [first_node_id],
-        "connections": connections
-    }
-
-
 def cij_matrix(points_list):
     n = len(points_list)
     cij = [[0.0] * n for _ in range(n)]

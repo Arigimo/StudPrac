@@ -33,7 +33,7 @@ class CalcRequest(BaseModel):
 
 @app.post("/solve")
 async def solve_task(data: CalcRequest):
-
-    result = model_solver(data.points, data.cost, data.capacity)
-
+    points_for_math = [(p.x, p.y) for p in data.points]
+    result = model_solver(points_for_math, data.cost, data.capacity)
+    save_project(data.project_name, data.model_dump(), result)
     return result

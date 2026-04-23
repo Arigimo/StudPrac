@@ -1,4 +1,4 @@
-import  psycopg2
+import psycopg2
 import json
 
 DB_data = {
