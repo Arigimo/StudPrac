@@ -36,3 +36,4 @@ def model(points_list, C, K):
     model = pyo.ConcreteModel()
     model.z = pyo.Var(range(n), domain = pyo.Binary)
     model.e = pyo.Var(range(n), range(n), domain = pyo.Binary)
+    """ZALUPA INTERTAMENT"""
