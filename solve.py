@@ -55,4 +55,12 @@ def model(points_list, C, K):
     model = pyo.ConcreteModel()
     model.z = pyo.Var(range(n), domain = pyo.Binary)
     model.e = pyo.Var(range(n), range(n), domain = pyo.Binary)
-
+    model.obj = pyo.Objective(func = C * sum(model.z[j] for j in range(n)) + sum(cij[i][j] * model.e[i,j] for i in range(n) for j in range(n)), find = pyo.minimize)
+    model.constraint1 = pyo.ConstraintList()
+    for i in range(n):
+        model.constraint1.add(sum(model.e[i,j] for j in range(n) == 1))
+    model.constraint2 = pyo.ConstraintList()
+    for j in range(n):
+        model.constraint2.add(sum(model.e[i, j] for i in range(n)) <= K * model.z[j])
+    solver = pyo.SolverFactory('cbc')
+    result = solver.solve(model, tee = False)
