@@ -36,3 +36,13 @@ def model(points_list, C, K):
     model = pyo.ConcreteModel()
     model.z = pyo.Var(range(n), domain = pyo.Binary)
     model.e = pyo.Var(range(n), range(n), domain = pyo.Binary)
+
+    def solve_math_model(points_list, cost, capacity):
+        # Сюда твой напарник-математик впишет свой код Pyomo
+        # А пока мы просто возвращаем пустой результат
+        print("Математика запущена!")
+        return {
+            "status": "ok",
+            "total_cost": 0,
+            "connections": []
+        }
