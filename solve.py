@@ -4,8 +4,6 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Tuple
 
-git = 1
-
 def cij_matrix(points_list):
     n = len(points_list)
     cij = [[0.0] * n for _ in range(n)]

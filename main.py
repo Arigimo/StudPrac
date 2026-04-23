@@ -45,3 +45,4 @@ async def solve_task(data: calc_request):
     }
 
     return mock_result
+
