@@ -4,6 +4,17 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Tuple
 
+
+def solve_math_model(points_list, cost, capacity):
+    # Сюда твой напарник-математик впишет свой код Pyomo
+    # А пока мы просто возвращаем пустой результат
+    print("Математика запущена!")
+    return {
+        "status": "ok",
+        "total_cost": 0,
+        "connections": []
+    }
+
 def cij_matrix(points_list):
     n = len(points_list)
     cij = [[0.0] * n for _ in range(n)]
@@ -37,12 +48,3 @@ def model(points_list, C, K):
     model.z = pyo.Var(range(n), domain = pyo.Binary)
     model.e = pyo.Var(range(n), range(n), domain = pyo.Binary)
 
-    def solve_math_model(points_list, cost, capacity):
-        # Сюда твой напарник-математик впишет свой код Pyomo
-        # А пока мы просто возвращаем пустой результат
-        print("Математика запущена!")
-        return {
-            "status": "ok",
-            "total_cost": 0,
-            "connections": []
-        }
