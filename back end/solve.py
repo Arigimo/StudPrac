@@ -1,8 +1,6 @@
 import math
 import pyomo.environ as pyo
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List, Tuple
+
 
 
 def cij_matrix(points_list):
