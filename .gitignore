@@ -1,6 +1,12 @@
 # Настройки PyCharm
 .idea/
 
+node_modules
+dist
+release
+*.exe
+.env
+
 # Виртуальное окружение
 .venv/
 venv/
