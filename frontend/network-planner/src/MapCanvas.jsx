@@ -17,7 +17,7 @@ const MapCanvas = ({ nodes, edges, onNodesChange, mode, setNodes, setSelectedNod
       position,
       data: { C: 0, K: 0 }, // Начальные параметры для каждой точки
       style: { 
-        background: '#a00dc5', 
+        background: '#830aa1', 
         width: 12, 
         height: 12, 
         borderRadius: '50%', 

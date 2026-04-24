@@ -9,54 +9,46 @@ function AppContent() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [mode, setMode] = useState('add'); 
-  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [params, setParams] = useState({ C: 5000, K: 3 }); // Начальные значения как на картинке
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
     []
   );
 
-  const updateNodeParams = (id, field, value) => {
-    setNodes((nds) => nds.map((node) => {
-      if (node.id === id) {
-        return { ...node, data: { ...node.data, [field]: Number(value) } };
-      }
-      return node;
-    }));
-  };
-
   const handleSolve = async () => {
     try {
-      // Подготовка данных в формате: id, x, y, C, K
-      const payload = nodes.map(n => ({
-        id: n.id,
-        x: Math.round(n.position.x),
-        y: Math.round(n.position.y),
-        C: n.data.C || 0,
-        K: n.data.K || 0
-      }));
+      // 1. Создаем список точек в формате [id, x, y]
+      const pointsList = nodes.map(n => [
+        n.id, 
+        Math.round(n.position.x), 
+        Math.round(n.position.y)
+      ]);
 
-      const result = await solveNetworkTask(payload);
+      // 2. Формируем итоговый массив: точки + C + K в конце
+      const finalData = [...pointsList, params.C, params.K];
+
+      console.log("Отправляем на бэкенд:", finalData);
+
+      const result = await solveNetworkTask(finalData);
       
-      // Красим магистральные узлы в желтый
+      // Визуализация ответа (красим Core Nodes и рисуем линии)
       const coreIds = result.coreNodes || [];
       setNodes((nds) => nds.map((node) => ({
         ...node,
         style: { 
           ...node.style, 
-          background: coreIds.includes(node.id) ? '#d6be38' : '#000000',
-          border: coreIds.includes(node.id) ? '3px solid #e4ae49' : '2px solid #fff'
+          background: coreIds.includes(node.id) ? '#bda000' : '#080518',
+          border: coreIds.includes(node.id) ? '3px solid #aa6f00' : '2px solid #080518'
         }
       })));
 
-      // Рисуем линии связи
       setEdges((result.edges || []).map((e, i) => ({
         id: `e-${i}`, source: e.from, target: e.to, animated: true, style: { stroke: '#2196F3' }
       })));
 
-      alert("Решение получено!");
     } catch (err) {
-      alert("Ошибка. Проверьте, запущен ли бэкенд.");
+      alert("Ошибка. Проверьте соединение с бэкендом.");
     }
   };
 
@@ -64,23 +56,18 @@ function AppContent() {
     <div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
       <WindowBar 
         mode={mode} setMode={setMode} 
-        nodes={nodes} selectedNodeId={selectedNodeId}
-        updateNodeParams={updateNodeParams}
+        nodes={nodes} params={params} setParams={setParams}
         onSolve={handleSolve} 
-        onClear={() => {setNodes([]); setEdges([]); setSelectedNodeId(null);}} 
+        onClear={() => {setNodes([]); setEdges([]);}} 
       />
       <MapCanvas 
         nodes={nodes} edges={edges} onNodesChange={onNodesChange} 
-        mode={mode} setNodes={setNodes} setSelectedNodeId={setSelectedNodeId} 
+        mode={mode} setNodes={setNodes} 
       />
     </div>
   );
 }
 
 export default function App() {
-  return (
-    <ReactFlowProvider>
-      <AppContent />
-    </ReactFlowProvider>
-  );
+  return <ReactFlowProvider><AppContent /></ReactFlowProvider>;
 }
