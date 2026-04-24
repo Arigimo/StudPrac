@@ -44,7 +44,7 @@ def save_project(name, input_dict, result_dict):
         conn.commit()
         conn.close()
         cursor.close()
-        print("Проект '{name}' сохранен в PostgreSQL.")
+        print(f"Проект '{name}' сохранен в PostgreSQL.")
     except Exception:
-        print("Не удалось сохранить в базу")
+        print(f"Не удалось сохранить '{name}'в базу")
 
