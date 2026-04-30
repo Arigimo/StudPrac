@@ -6,6 +6,7 @@ import WindowBar from './WindowBar';
 import 'reactflow/dist/style.css';
 
 function AppContent() {
+  const [resultStats, setResultStats] = useState({ cost: 0, coreCount: 0, coreList: [] });
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   const [mode, setMode] = useState('add'); 
@@ -17,44 +18,56 @@ function AppContent() {
   );
 
   const handleSolve = async () => {
-    try {
-      // 1. Создаем список точек в формате [id, x, y]
-      const pointsList = nodes.map(n => [
-        n.id, 
-        Math.round(n.position.x), 
-        Math.round(n.position.y)
-      ]);
+  try {
+    const payload = nodes.map(n => [n.id, Math.round(n.position.x), Math.round(n.position.y)]);
+    const finalData = [...payload, params.C, params.K];
 
-      // 2. Формируем итоговый массив: точки + C + K в конце
-      const finalData = [...pointsList, params.C, params.K];
+    const result = await solveNetworkTask(finalData);
+    
+    // 1. Сохраняем статистику для WindowBar
+    setResultStats({
+      cost: result.total_cost,
+      coreCount: result.core_nodes.length,
+      coreList: result.core_nodes
+    });
 
-      console.log("Отправляем на бэкенд:", finalData);
-
-      const result = await solveNetworkTask(finalData);
-      
-      // Визуализация ответа (красим Core Nodes и рисуем линии)
-      const coreIds = result.coreNodes || [];
-      setNodes((nds) => nds.map((node) => ({
+    // 2. Красим узлы. result.core_nodes содержит индексы (0, 1, 2...)
+    setNodes((nds) => nds.map((node, index) => {
+      const isCore = result.core_nodes.includes(index);
+      return {
         ...node,
         style: { 
           ...node.style, 
-          background: coreIds.includes(node.id) ? '#bda000' : '#080518',
-          border: coreIds.includes(node.id) ? '3px solid #aa6f00' : '2px solid #080518'
+          background: isCore ? '#FF4500' : '#333', // Оранжевый для Core
+          border: isCore ? '3px solid #000' : '2px solid #fff',
+          width: isCore ? 16 : 12,
+          height: isCore ? 16 : 12
         }
-      })));
+      };
+    }));
 
-      setEdges((result.edges || []).map((e, i) => ({
-        id: `e-${i}`, source: e.from, target: e.to, animated: true, style: { stroke: '#2196F3' }
-      })));
+    // 3. Создаем связи. connections: [[точка, центр], ...]
+    const newEdges = result.connections
+      .filter(([from, to]) => from !== to) // Не рисуем линию из точки в саму себя
+      .map(([fromIndex, toIndex], i) => ({
+        id: `e-${i}`,
+        source: nodes[fromIndex].id,
+        target: nodes[toIndex].id,
+        animated: true,
+        style: { stroke: '#FF4500', strokeWidth: 2 }
+      }));
 
-    } catch (err) {
-      alert("Ошибка. Проверьте соединение с бэкендом.");
-    }
-  };
+    setEdges(newEdges);
+
+  } catch (err) {
+    alert("Ошибка. Проверьте формат ответа бэкенда.");
+  }
+};
 
   return (
     <div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
       <WindowBar 
+      resultStats={resultStats}
         mode={mode} setMode={setMode} 
         nodes={nodes} params={params} setParams={setParams}
         onSolve={handleSolve} 

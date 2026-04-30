@@ -1,6 +1,6 @@
 import React from 'react';
 
-const WindowBar = ({ mode, setMode, params, setParams, nodes, onSolve, onClear }) => {
+const WindowBar = ({ mode, setMode, params, setParams, nodes, onSolve, onClear, resultStats }) => {
   return (
     <div style={{ 
       width: '320px', padding: '20px', background: '#f4f4f4', 
@@ -35,23 +35,25 @@ const WindowBar = ({ mode, setMode, params, setParams, nodes, onSolve, onClear }
         </label>
       </div>
 
-      <div style={{ flexGrow: 1, overflowY: 'auto', marginTop: '10px' }}>
-        <h4>Список точек (id, x, y):</h4>
-        <div style={{ fontSize: '12px', background: '#fff', padding: '10px', border: '1px solid #ddd' }}>
-          {nodes.length === 0 ? "Точек нет" : nodes.map(n => (
-            <div key={n.id} style={{ marginBottom: '5px', borderBottom: '1px solid #eee' }}>
-              ID: {n.id.slice(-3)} | <b>({Math.round(n.position.x)}, {Math.round(n.position.y)})</b>
-            </div>
+ <div style={{ flexGrow: 1, overflowY: 'auto' }}>
+        <h4>Список точек:</h4>
+        <div style={{ fontSize: '11px', background: '#fff', padding: '8px', border: '1px solid #ddd' }}>
+          {nodes.map((n, i) => (
+            <div key={n.id}>[{i}] ID: {n.id.slice(-3)} ({Math.round(n.position.x)}, {Math.round(n.position.y)})</div>
           ))}
         </div>
       </div>
 
-      <button onClick={onClear} style={{ padding: '8px', cursor: 'pointer' }}>Очистить карту</button>
-      
-      <button onClick={onSolve} style={{ 
-        padding: '15px', background: '#00447c', color: '#fff', 
-        border: 'none', fontWeight: 'bold', borderRadius: '5px', cursor: 'pointer' 
-      }}>
+      {/* НОВЫЙ БЛОК: Итоговая информация */}
+      <div style={{ background: '#333', color: '#fff', padding: '15px', borderRadius: '8px', fontSize: '13px' }}>
+        <h4 style={{ margin: '0 0 10px 0', color: '#FFD700' }}>Результаты расчета:</h4>
+        <div style={{ marginBottom: '5px' }}>Общая стоимость: <b>{resultStats.cost}</b></div>
+        <div style={{ marginBottom: '5px' }}>Кол-во Core Nodes: <b>{resultStats.coreCount}</b></div>
+        <div>Индексы Core: <b>{resultStats.coreList.join(', ')}</b></div>
+      </div>
+
+      <button onClick={onClear}>Очистить</button>
+      <button onClick={onSolve} style={{ padding: '15px', background: '#2196F3', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}>
         НАЙТИ РЕШЕНИЯ
       </button>
     </div>
